@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>VulnChecker report</title>
+    <link rel="stylesheet" href="theme.css" />
+    <style>
+      body {
+        line-height: 1.5;
+      }
+      .page {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 40px 24px 96px;
+      }
+      header.top {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 28px;
+      }
+      header.top img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+      }
+      header.top .name {
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 20px;
+      }
+      header.top .spacer {
+        flex: 1;
+      }
+      .summary {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 28px;
+        align-items: center;
+        padding: 24px;
+        margin-bottom: 12px;
+      }
+      .bigring {
+        position: relative;
+        width: 130px;
+        height: 130px;
+      }
+      .bigring svg {
+        transform: rotate(-90deg);
+      }
+      .bigring .val {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      .bigring .grade {
+        font-size: 48px;
+      }
+      .bigring .num {
+        font-size: 12px;
+        color: var(--text-dim);
+      }
+      .meta .url {
+        font-size: 14px;
+        color: var(--text);
+        word-break: break-all;
+        margin: 0 0 6px;
+      }
+      .meta .when {
+        font-size: 11px;
+        color: var(--text-faint);
+        margin-bottom: 14px;
+      }
+      .tallies {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .tallies .badge {
+        font-size: 11px;
+      }
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        margin: 24px 0 20px;
+      }
+      .filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .chip {
+        cursor: pointer;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 6px 11px;
+        border-radius: 999px;
+        border: 1px solid var(--border-strong);
+        background: transparent;
+        color: var(--text-dim);
+      }
+      .chip[aria-pressed='true'] {
+        background: var(--bg-elev-2);
+        color: var(--text);
+        border-color: var(--accent);
+      }
+      .toolbar .grow {
+        flex: 1;
+      }
+      section.group {
+        margin-bottom: 30px;
+      }
+      section.group > h2 {
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--text-dim);
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 14px;
+        display: flex;
+        justify-content: space-between;
+      }
+      .finding {
+        border: 1px solid var(--border);
+        border-left-width: 3px;
+        border-radius: 10px;
+        padding: 16px 18px;
+        margin-bottom: 10px;
+        background: var(--bg-elev);
+      }
+      .finding .fhead {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .finding h3 {
+        font-size: 15px;
+        font-weight: 500;
+        font-family: var(--font-mono);
+      }
+      .finding .detail {
+        font-size: 13px;
+        color: var(--text-dim);
+        margin: 8px 0 0;
+      }
+      .finding .fix {
+        font-size: 13px;
+        color: var(--text);
+        margin: 10px 0 0;
+        padding: 10px 12px;
+        background: var(--bg-elev-2);
+        border-radius: 8px;
+      }
+      .finding .fix b {
+        color: var(--good);
+        font-weight: 600;
+      }
+      .finding pre {
+        margin: 10px 0 0;
+        padding: 10px 12px;
+        background: #000;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 12px;
+        color: var(--text-dim);
+        overflow-x: auto;
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+      .finding a.ref {
+        font-size: 12px;
+        color: var(--text-dim);
+      }
+      .sevtag {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        padding: 2px 8px;
+        border-radius: 999px;
+        border: 1px solid currentColor;
+      }
+      footer.note {
+        margin-top: 40px;
+        padding-top: 18px;
+        border-top: 1px solid var(--border);
+        font-size: 12px;
+        color: var(--text-faint);
+        line-height: 1.6;
+      }
+      .empty {
+        color: var(--text-faint);
+        font-size: 13px;
+        padding: 40px 0;
+        text-align: center;
+      }
+
+      /* Written summary — reads as prose, not chips. */
+      .exec {
+        padding: 26px 28px;
+        margin: 12px 0 4px;
+      }
+      .exec h2 {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        color: var(--text-dim);
+        margin-bottom: 14px;
+      }
+      .exec .lede {
+        font-size: 16px;
+        line-height: 1.7;
+        color: var(--text);
+      }
+      .exec .lede b {
+        font-weight: 600;
+      }
+      .exec h3 {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--text-faint);
+        margin: 22px 0 12px;
+      }
+      .prio {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        counter-reset: prio;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .prio li {
+        counter-increment: prio;
+        position: relative;
+        padding-left: 34px;
+        font-size: 14px;
+        line-height: 1.6;
+        color: var(--text-dim);
+      }
+      .prio li::before {
+        content: counter(prio);
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 22px;
+        height: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        border: 1px solid var(--border-strong);
+        font-size: 11px;
+        color: var(--text);
+      }
+      .prio li b {
+        color: var(--text);
+        font-weight: 600;
+      }
+      .prio li .fixline {
+        color: var(--good);
+      }
+
+      /* Standard / owner view switch */
+      .viewswitch {
+        display: inline-flex;
+        gap: 4px;
+        padding: 4px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        margin: 26px 0 4px;
+      }
+      .seg {
+        cursor: pointer;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        padding: 7px 15px;
+        border-radius: 999px;
+        border: 0;
+        background: transparent;
+        color: var(--text-dim);
+      }
+      .seg[aria-pressed='true'] {
+        background: var(--accent);
+        color: var(--bg);
+      }
+      .banner {
+        border: 1px dashed var(--border-strong);
+        border-radius: 10px;
+        padding: 16px 18px;
+        margin-bottom: 18px;
+        font-size: 13.5px;
+        line-height: 1.6;
+        color: var(--text-dim);
+      }
+      .banner b {
+        color: var(--text);
+        font-weight: 600;
+      }
+      .catintro {
+        font-size: 13px;
+        color: var(--text-faint);
+        margin: -6px 0 12px;
+      }
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <img src="../icons/icon-128.png" alt="" />
+        <div class="name">Vuln<span style="color: var(--text-dim)">Checker</span></div>
+        <div class="spacer"></div>
+        <button class="btn" id="exportMd">Export .md</button>
+        <button class="btn" id="exportJson">Export .json</button>
+      </header>
+
+      <div class="summary card">
+        <div class="bigring">
+          <svg width="130" height="130" viewBox="0 0 130 130">
+            <circle cx="65" cy="65" r="56" fill="none" stroke="var(--border)" stroke-width="9" />
+            <circle
+              id="ringFill"
+              cx="65"
+              cy="65"
+              r="56"
+              fill="none"
+              stroke="var(--good)"
+              stroke-width="9"
+              stroke-linecap="round"
+              stroke-dasharray="352"
+              stroke-dashoffset="352"
+            />
+          </svg>
+          <div class="val">
+            <span class="grade" id="grade">–</span>
+            <span class="num"><span id="score">0</span>/100</span>
+          </div>
+        </div>
+        <div class="meta">
+          <p class="eyebrow">Audited</p>
+          <p class="url" id="url">—</p>
+          <p class="when" id="when"></p>
+          <div class="tallies" id="tallies"></div>
+        </div>
+      </div>
+
+      <section class="exec card" id="exec"></section>
+
+      <div class="viewswitch" id="viewswitch">
+        <button class="seg" data-view="standard" aria-pressed="true">Standard report</button>
+        <button class="seg" data-view="owner" aria-pressed="false">I own this site</button>
+      </div>
+
+      <div class="banner hidden" id="ownerBanner"></div>
+
+      <div class="toolbar">
+        <div class="filters" id="filters"></div>
+        <span class="grow"></span>
+        <label class="chip" style="cursor: pointer">
+          <input type="checkbox" id="showGood" style="vertical-align: -1px" /> show passing
+        </label>
+      </div>
+
+      <div id="groups"></div>
+
+      <footer class="note">
+        VulnChecker runs entirely in your browser — no data about the sites you
+        scan is stored or transmitted. Findings are heuristic and meant to guide
+        a manual review, not to replace a professional penetration test. Only run
+        the active checks on sites you own or are authorised to test.
+      </footer>
+    </div>
+
+    <script type="module" src="report.js"></script>
+  </body>
+</html>

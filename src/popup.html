@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="theme.css" />
+    <style>
+      body {
+        width: 380px;
+        min-height: 200px;
+      }
+      .wrap {
+        padding: 16px;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+      header img {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+      }
+      header .name {
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 15px;
+        letter-spacing: -0.01em;
+      }
+      header .name b {
+        color: var(--text);
+      }
+      .host {
+        font-size: 11px;
+        color: var(--text-dim);
+        word-break: break-all;
+        margin-bottom: 14px;
+      }
+      .scoreRow {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 14px;
+        margin-bottom: 12px;
+      }
+      .ring {
+        position: relative;
+        width: 76px;
+        height: 76px;
+        flex: none;
+      }
+      .ring svg {
+        transform: rotate(-90deg);
+      }
+      .ring .val {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
+      }
+      .ring .grade {
+        font-size: 26px;
+      }
+      .ring .num {
+        font-size: 10px;
+        color: var(--text-dim);
+      }
+      .tallies {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        flex: 1;
+      }
+      .status {
+        font-size: 12px;
+        color: var(--text-dim);
+        line-height: 1.5;
+        min-height: 34px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .spinner {
+        width: 14px;
+        height: 14px;
+        border: 2px solid var(--border-strong);
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+        flex: none;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .top {
+        list-style: none;
+        margin: 0 0 12px;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .top li {
+        display: flex;
+        gap: 8px;
+        align-items: baseline;
+        padding: 8px 10px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 12px;
+        line-height: 1.4;
+      }
+      .top li .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: currentColor;
+        flex: none;
+        transform: translateY(-1px);
+      }
+      .top li span.t {
+        color: var(--text);
+      }
+      .owner {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        font-size: 11px;
+        color: var(--text-dim);
+        line-height: 1.45;
+        padding: 10px;
+        border: 1px dashed var(--border-strong);
+        border-radius: 8px;
+        margin-bottom: 12px;
+      }
+      .owner input {
+        margin-top: 1px;
+      }
+      .actions {
+        display: flex;
+        gap: 8px;
+      }
+      .actions .btn {
+        flex: 1;
+      }
+      footer {
+        margin-top: 14px;
+        font-size: 10px;
+        color: var(--text-faint);
+        line-height: 1.5;
+      }
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <img src="../icons/icon-48.png" alt="" />
+        <div class="name">Vuln<b>Checker</b></div>
+        <span class="badge" style="margin-left: auto" id="verBadge">v1.0</span>
+      </header>
+
+      <div class="host" id="host">Reading current tab…</div>
+
+      <div class="scoreRow card hidden" id="scoreRow">
+        <div class="ring">
+          <svg width="76" height="76" viewBox="0 0 76 76">
+            <circle cx="38" cy="38" r="33" fill="none" stroke="var(--border)" stroke-width="6" />
+            <circle
+              id="ringFill"
+              cx="38"
+              cy="38"
+              r="33"
+              fill="none"
+              stroke="var(--good)"
+              stroke-width="6"
+              stroke-linecap="round"
+              stroke-dasharray="207"
+              stroke-dashoffset="207"
+            />
+          </svg>
+          <div class="val">
+            <span class="grade" id="grade">–</span>
+            <span class="num"><span id="score">0</span>/100</span>
+          </div>
+        </div>
+        <div class="tallies" id="tallies"></div>
+      </div>
+
+      <div class="status" id="status"><span class="spinner"></span> Scanning this page…</div>
+
+      <ul class="top" id="top"></ul>
+
+      <label class="owner" id="ownerBox">
+        <input type="checkbox" id="ownerToggle" />
+        <span
+          >I own this site — enable active checks (a single harmless, read-only
+          request that looks for reflected input). Only tick this for sites you
+          control.</span
+        >
+      </label>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="report" disabled>Full report</button>
+        <button class="btn" id="rescan">Re-scan</button>
+      </div>
+
+      <footer>
+        Everything runs locally in your browser. Nothing about the sites you scan
+        is stored or sent anywhere.
+      </footer>
+    </div>
+
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>
